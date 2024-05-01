@@ -1,16 +1,23 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
 	"os"
 	"sheremet-o/GO_spam_masker.git/masker"
+	"sheremet-o/GO_spam_masker.git/service"
 )
 
 func main() {
-	message := bufio.NewReader(os.Stdin)
-	fmt.Print("Введите текст: ")
-	words, _ := message.ReadString('\n')
-	maskedMessage := masker.Masker(words)
-	fmt.Println(maskedMessage)
+	if len(os.Args) < 2 {
+		fmt.Println("Укажите путь к файлу в аргументах запуска")
+		return
+	}
+
+	filePath := os.Args[1]
+
+	producer := &service.FileProducer{FilePath: filePath}
+	presenter := &service.FileWriterPresenter{FilePath: "output.txt"}
+
+	service := masker.NewMaskingService(producer, presenter)
+	service.Run()
 }
