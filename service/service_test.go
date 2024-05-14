@@ -1,7 +1,7 @@
-package masker_test
+package service_test
 
 import (
-	"masker"
+	"sheremet-o/GO_spam_masker.git/masker"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -28,10 +28,10 @@ func (mp *MockPresenter) Present(data []string) error {
 
 func TestMaskingService_Run(t *testing.T) {
 	mockProducer := new(MockProducer)
-	mockProducer.On("Produce").Return([]string{"http://example.com", "This is a message"}, nil)
+	mockProducer.On("Produce").Return([]string{"http://example.com", "Строка:"}, nil)
 
 	mockPresenter := new(MockPresenter)
-	mockPresenter.On("Present", []string{"****example.com", "This is a message"}).Return(nil)
+	mockPresenter.On("Present", []string{"http://***********", "Строка:"}).Return(nil)
 
 	ms := masker.NewMaskingService(mockProducer, mockPresenter)
 	ms.Run()
@@ -43,8 +43,8 @@ func TestMaskingService_Run(t *testing.T) {
 func TestMaskingService_Masker(t *testing.T) {
 	ms := masker.MaskingService{}
 
-	input := "http://example.com is a link"
-	expectedOutput := "****example.com is a link"
+	input := "Ссылка http://example.com"
+	expectedOutput := "Ссылка http://***********"
 
 	assert.Equal(t, expectedOutput, ms.Masker(input))
 }
