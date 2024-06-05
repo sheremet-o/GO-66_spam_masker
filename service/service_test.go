@@ -40,6 +40,34 @@ func TestMaskingService_Run(t *testing.T) {
 	mockPresenter.AssertExpectations(t)
 }
 
+func TestMaskingServiceManyLinks_Run(t *testing.T) {
+	mockProducer := new(MockProducer)
+	mockProducer.On("Produce").Return([]string{"http://example.com and http://test.com"}, nil)
+
+	mockPresenter := new(MockPresenter)
+	mockPresenter.On("Present", []string{"http://*********** and http://********"}).Return(nil)
+
+	ms := masker.NewMaskingService(mockProducer, mockPresenter)
+	ms.Run()
+
+	mockProducer.AssertExpectations(t)
+	mockPresenter.AssertExpectations(t)
+}
+
+func TestMaskingServiceEmpty_Run(t *testing.T) {
+	mockProducer := new(MockProducer)
+	mockProducer.On("Produce").Return([]string{" ", "Строка:"}, nil)
+
+	mockPresenter := new(MockPresenter)
+	mockPresenter.On("Present", []string{" ", "Строка:"}).Return(nil)
+
+	ms := masker.NewMaskingService(mockProducer, mockPresenter)
+	ms.Run()
+
+	mockProducer.AssertExpectations(t)
+	mockPresenter.AssertExpectations(t)
+}
+
 func TestMaskingService_Masker(t *testing.T) {
 	ms := masker.MaskingService{}
 
